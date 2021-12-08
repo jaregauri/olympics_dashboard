@@ -1,7 +1,5 @@
 from django.db import models
 
-
-
 class Medals(models.Model):
     id = models.IntegerField(db_column='ID', primary_key=True)  # Field name made lowercase.
     medalname = models.CharField(db_column='MedalName', max_length=255)  # Field name made lowercase.

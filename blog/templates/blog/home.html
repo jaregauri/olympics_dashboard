@@ -1,32 +1,493 @@
 {% extends "blog/base.html" %}
+
+
 {% block content %}
-    {% for i in medals %}
-        <article class="media content-section">
-          <div class="media-body">
-            <div class="article-metadata">
-              <a class="mr-2" href="#">{{ i.id }}</a>
-              <small class="text-muted">{{ i.medalname }}</small>
-            </div>
-            <!-- <h2><a class="article-title" href="#">{{ post.title }}</a></h2> -->
-            <!-- <p class="article-content">{{ post.content }}</p> -->
-          </div>
-        </article>
-    {% endfor %}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- <form action ="" method ="post">
+<br>
+  {% csrf_token %}
+  {{ form }}
+  <input>
+  <button type="submit">submit</button>
+
+
+</form> -->
+<!-- <form action="" method="post">
+  <input id="search" name="search" type="text" class="query-search" 
+   placeholder="Search...">
+  <input class="btn btn-primary" type="submit" value="submit">
+  
+</form> -->
+
+  <!-- <form action="" method="post">
+  {% csrf_token %}
+<select id = "search"  name="search" class="form-select" aria-label="Default select example">
+  <option selected>Open this select menu</option>
+  <option value="1896">1896</option>
+  <option value="1996">1996</option>
+  <option value="2000">2000</option>
+  <option value="2010">2010</option>
+  <option value="2014">2014</option>
+  <option value="2016">2016</option>
+</select>
+<input class="btn btn-primary" type="submit" value="submit">
+</form> -->
+ <!-- <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Year
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">1896</a>
+    <a class="dropdown-item" href="#">1996</a>
+    <a class="dropdown-item" href="#">2000</a>
+    <a class="dropdown-item" href="#">2010</a>
+    <a class="dropdown-item" href="#">2014</a>
+    <a class="dropdown-item" href="#">2016</a>
+  </div>
+</div> -->
+&nbsp;&nbsp;&nbsp;
+<!--
+<div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Sport
+  </button>
+  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+    <a class="dropdown-item" href="#">Football</a>
+    <a class="dropdown-item" href="#">Badminton</a>
+    <a class="dropdown-item" href="#">Table Tennis</a>
+    <a class="dropdown-item" href="#">Swimming</a>
+    <a class="dropdown-item" href="#">Wrestling</a>
+    <a class="dropdown-item" href="#">Triathlon</a>
+  </div>
+</div> -->
+
+
+<h1>Male and female participation for a sport and a specified year</h1>
+<h2>Year: {{ year1 }}</h2>
+<h2>Sport: {{ sportName1 }}</h2>
+<div>
+  <canvas id="myChart" width="800" height="400"></canvas>
+</div>
+<br><br>
+
+<h1>Trends in male and female participation over the years for a sport </h1>
+<h2>Sport: {{ sportName8 }}</h2>
+<div>
+  <canvas id="bar-chart-grouped" width="800" height="450"></canvas>
+</div>
+
+<h1>Male and Female participants by a country over years from all sports</h1>
+<h2>Country: {{ NOC7 }}</h2>
+<div>
+  <canvas id="line-chart-query7" width="800" height="450"></canvas>
+</div>
+
+
+<h1>Total participants for a country over the years</h1>
+<h2>Country: {{ country2 }}</h2>
+<div><canvas id="line-chart" width="800" height="450"></canvas>
+</div>
+
+
+<br><br>
+
+
+<h1>Total medals won by a country in all sports over years</h1>
+<h2>Country: {{ NOC3 }}</h2>
+<div>
+  <canvas id="line-chart-medals" width="800" height="450"></canvas>
+</div>
+
+<br><br>
+
+<h1>Medals won for a specific year by a country and in a particular sport</h1>
+<h2>Country: {{ NOC4 }}</h2>
+<h2>Year: {{ year4 }}</h2>
+<h2>Sport: {{ sport4 }}</h2>
+<div margin= auto>
+  <canvas id="pie-chart" width="400" height="400"></canvas>
+</div>  
+
+<br><br>
+
+<h1>Total medals won over the years by a country in all sports</h1>
+<h2>Country: {{ NOC6 }}</h2>
+<div margin= auto>
+  <canvas id="line-chart-query6" width="800" height="500"></canvas>
+</div>  
+
+<br><br>
+
+
+<h1>Performance trend of a country in a particular sport over the years</h1>
+<h2>Country: {{ NOC9 }}</h2>
+<h2>Sport: {{ sportName9 }}</h2>
+<div>
+  <canvas id="bar-chart-query9" width="800" height="450"></canvas>
+</div>
+
+<br><br>
+
+<h1>Number of participants age wise for a particular sport</h1>
+<h2>Sport: {{ sportName10 }}</h2>
+<div>
+  <canvas id="line-chart-query10" width="800" height="450"></canvas>
+</div>
+
+<br><br>
+
+<h1>Number of participants age wise from a country</h1>
+<h2>Country: {{ NOC11 }}</h2>
+<div>
+  <canvas id="line-chart-query11" width="800" height="450"></canvas>
+</div>
+
+
+<h1>Number of participants age wise from a country and a particular sport</h1>
+<h2>Country: {{ NOC12 }}</h2>
+<h2>Sport: {{ sportName12 }}</h2>
+<div>
+  <canvas id="line-chart-query12" width="800" height="450"></canvas>
+</div>
+
+<br><br>
 
 
 
-    {% for i in city %}
+<script>
+/* When the user clicks on the button,
+toggle between hiding and showing the dropdown content */
+
+  var data = JSON.parse("{{data|escapejs}}");
+  console.log(data)
+// #query1
+  
+  const ctx = document.getElementById('myChart');
+  const myChart = new Chart(ctx, {
+  
+      type: 'bar',
+      data: {
+          labels: ['MALE', 'FEMALE'],
+          datasets: [{
+              label: 'participation',
+              data: [ data['male_participation'] ,  data['female_participation'] ],
+              backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)'
+              ],
+              borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)'
+              ],
+              borderWidth: 2
+          }]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: true
+              }
+          }
+      }
+  });
+  // query2 
+  new Chart(document.getElementById("line-chart"), {
+  type: 'line',
+  data: {
+    labels: data['year2'],
+    datasets: [{ 
+        data: data['total_count2'],
+        label: "no. of participants",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+      // , { 
+      //   data: [282,350,411,502,635,809,947,1402,3700,5267],
+      //   label: "Asia",
+      //   borderColor: "#8e5ea2",
+      //   fill: false
+      // }, { 
+      //   data: [168,170,178,190,203,276,408,547,675,734],
+      //   label: "Europe",
+      //   borderColor: "#3cba9f",
+      //   fill: false
+      // }, { 
+      //   data: [40,20,10,16,24,38,74,167,508,784],
+      //   label: "Latin America",
+      //   borderColor: "#e8c3b9",
+      //   fill: false
+      // }, { 
+      //   data: [6,3,2,2,7,26,82,172,312,433],
+      //   label: "North America",
+      //   borderColor: "#c45850",
+      //   fill: false
+      // }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'World population per region (in millions)'
+    }
+  }
+});
+
+//query3
+
+new Chart(document.getElementById("line-chart-medals"), {
+  type: 'line',
+  data: {
+    labels: data['name3'],
+    datasets: [{ 
+        data: data['medals_won3'],
+        label: "no. of medals won",
+        borderColor: "#c45850",
+        fill: false
+      }
+      
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'World population per region (in millions)'
+    }
+  }
+});
+
+// query4
+new Chart(document.getElementById("pie-chart"), {
+    type: 'pie',
+    data: {
+      labels: data['medal4'],
+      datasets: [{
+        label: "Medals won",
+        backgroundColor: ["#3e95cd", "#8e5ea2","#3cba9f","#e8c3b9","#c45850"],
+        data: data['medals_won4']
+      }]
+    },
+    options: {
+      responsive: false,
+      title: {
+        
+        display: true,
+        text: 'Predicted world population (millions) in 2050'
+      }
+    }
+});
+
+
+//query6
+
+new Chart(document.getElementById("line-chart-query6"), {
+  type: 'line',
+  data: {
+    labels: data['year6'],
+    datasets: [{ 
+        data: data['medals_won6'],
+        label: "no. of medals won",
+        borderColor: "#e8c3b9",
+        fill: false
+      }
+      
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'World population per region (in millions)'
+    }
+  }
+});
+
+// query7 
+new Chart(document.getElementById("line-chart-query7"), {
+  type: 'line',
+  data: {
+    labels: data['year7'],
+    datasets: [{ 
+        data: data['male_participants_cnt'],
+        label: "no. of male participants",
+        borderColor: "#3e95cd",
+        fill: false
+      }
+      , { 
+        data: data['female_participants_cnt'],
+        label: "no. of female participants",
+        borderColor: "#8e5ea2",
+        fill: false
+      }
+      //, { 
+      //   data: [168,170,178,190,203,276,408,547,675,734],
+      //   label: "Europe",
+      //   borderColor: "#3cba9f",
+      //   fill: false
+      // }, { 
+      //   data: [40,20,10,16,24,38,74,167,508,784],
+      //   label: "Latin America",
+      //   borderColor: "#e8c3b9",
+      //   fill: false
+      // }, { 
+      //   data: [6,3,2,2,7,26,82,172,312,433],
+      //   label: "North America",
+      //   borderColor: "#c45850",
+      //   fill: false
+      // }
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'World population per region (in millions)'
+    }
+  }
+});
+
+//query8
+new Chart(document.getElementById("bar-chart-grouped"), {
+    type: 'bar',
+    data: {
+      labels: data['year8'],
+      datasets: [
+        {
+          label: "male participants",
+          backgroundColor: "#3e95cd",
+          data: data['male_participants_cnt_8']
+        }, {
+          label: "female participants",
+          backgroundColor: "#8e5ea2",
+          data: data['female_participants_cnt_8']
+        }
+      ]
+    },
+    options: {
+      title: {
+        display: true,
+        text: 'Population growth (millions)'
+      }
+    }
+});
+
+// #query9
+  
+new Chart(document.getElementById('bar-chart-query9'), 
+{
+  
+      type: 'bar',
+      data: {
+          labels: data['year9'],
+          datasets: [{
+              label: 'performance rate',
+              data: data['medal_won9'] ,
+              backgroundColor: [
+                  'rgba(255, 99, 132, 0.2)',
+                  'rgba(54, 162, 235, 0.2)'
+              ],
+              borderColor: [
+                  'rgba(255, 99, 132, 1)',
+                  'rgba(54, 162, 235, 1)'
+              ],
+              borderWidth: 2
+          }]
+      },
+      options: {
+          scales: {
+              y: {
+                  beginAtZero: true
+              }
+          }
+      }
+  });
+
+  //query10
+
+new Chart(document.getElementById("line-chart-query10"), {
+  type: 'line',
+  data: {
+    labels: data['age10'],
+    datasets: [{ 
+        data: data['participants_cnt10'],
+        label: "no. of participants in a sport",
+        borderColor: "#c45850",
+        fill: false
+      }
+      
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'World population per region (in millions)'
+    }
+  }
+});
+
+  //query11
+
+  new Chart(document.getElementById("line-chart-query11"), {
+  type: 'line',
+  data: {
+    labels: data['age11'],
+    datasets: [{ 
+        data: data['participants_cnt11'],
+        label: "no. of participants in a country",
+        borderColor: "#8e5ea2",
+        fill: false
+      }
+      
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'World population per region (in millions)'
+    }
+  }
+});
+
+  //query12
+
+  new Chart(document.getElementById("line-chart-query12"), {
+  type: 'line',
+  data: {
+    labels: data['age12'],
+    datasets: [{ 
+        data: data['participants_cnt12'],
+        label: "no. of participants in a country and a sport",
+        borderColor: "#8e5ea2",
+        fill: false
+      }
+      
+    ]
+  },
+  options: {
+    title: {
+      display: true,
+      text: 'World population per region (in millions)'
+    }
+  }
+});
+  </script>
+  
+  
+   
+
+
+
+    <!-- {% for i in city %}
         <article class="media content-section">
           <div class="media-body">
             <div class="article-metadata">
               <a class="mr-2" href="#">{{ i.id }}</a>
               <small class="text-muted">{{ i.city }}</small>
-            </div>
+            </div> -->
             <!-- <h2><a class="article-title" href="#">{{ post.title }}</a></h2> -->
             <!-- <p class="article-content">{{ post.content }}</p> -->
-          </div>
+          <!-- </div>
         </article>
-    {% endfor %}
+    {% endfor %} 
 
 {% endblock content %}
 
